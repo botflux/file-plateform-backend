@@ -45,13 +45,14 @@ app.post('/character-checker', (req, res) => {
     // end of stream
     stream.push(null)
 
+    let id = 0
 
     stream
         .pipe(checker)
         // checker stream returns objects containing information about the issue
         // we just add this object to an array
         .on('data', o => { 
-            issues = [...issues, ...[o]] 
+            issues = [...issues, ...[{...o, ...{id: id++}}]] 
             console.log(o)
         })
         // when every issues are found we returns the array as a JSON.
