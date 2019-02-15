@@ -2,6 +2,9 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const fileUpload = require('express-fileupload')
 const cors = require('cors')
+const characterChecker = require('./character-checker')
+const fs = require('fs')
+const { Readable } = require('stream')
 
 const app = express()
 
@@ -17,12 +20,8 @@ app.use(fileUpload())
 
 app.post('/character-checker', (req, res) => {
     
-    // if (Object.keys(req.files))
-    
     const { files = {} } = req
     const { file = {} } = files || {}
-
-    console.log(req.files)
 
     if (file === undefined || file === null || Object.keys(file) == 0) {
         return res.json({
@@ -30,10 +29,26 @@ app.post('/character-checker', (req, res) => {
         })
     }
 
-    console.log(file)
-    return res.json({
-        message: 'Ok'
-    })
+    let issues = []
+
+    const checker = characterChecker()
+
+    const stream = new Readable()
+    stream.push(file.data)
+    stream.push(null)
+
+    stream
+        .pipe(checker)
+        .on('data', o => { 
+            issues = [...issues, ...[o]] 
+            console.log(o)
+        })
+        .on('end', () => {
+            res.json({
+                message: 'Ok',
+                result: issues
+            })
+        })
 })
 
 module.exports = app

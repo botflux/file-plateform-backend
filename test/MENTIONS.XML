@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<Mentions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="Mention.xsd">
+
+<Mention>
+<Annee>1♀↨941</Annee>
+<TypeActe>4</TypeActe>
+<NumeroActe>0004</NumeroActe>
+<NumeroPage>1</NumeroPage>
+<TypeMention>Mention "mort pour la France"</TypeMention>
+<TexteMention>♫→Mort pour la France le quinze Mai mil neuf cent quarante, Janvier mil neuf cent quarante et un. Pour le Ministre et pour son ordre , le chef de service des susnomm�s et des inspections militaires : Illisibles. L'acte de D�c�s a �t� transmis le six f�vrier mil neuf cent quarante et un, quinze heures, par nous, ?, Maire du Longeron.</TexteMention>
+<TexteIllisible>true</TexteIllisible>
+</Mention>
+
+</Mentions>

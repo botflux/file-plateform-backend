@@ -1,7 +1,17 @@
-const checker = require('./index')
-const fs = require('fs')
-const { Readable } = require('stream')
+const characterChecker = require('./index')
+const { createReadStream } = require('fs')
 
-fs.createReadStream('test/test.txt')
+const stream = createReadStream('test/MENTIONS.XML') 
+const checker = characterChecker()
+
+stream
     .pipe(checker)
-    .on('data', chunk => console.log(chunk))
+
+stream.on('error', () => console.log('source.error'))
+stream.on('finish', () => console.log('source.finish'))
+stream.on('end', () => console.log('source.end'))
+stream.on('close', () => console.log('source.close'))
+checker.on('error', () => console.log('transform.error'))
+checker.on('end', () => console.log('transform.end'))
+checker.on('close', () => console.log('transform.close'))
+checker.on('data', () => console.log('transform.data'))

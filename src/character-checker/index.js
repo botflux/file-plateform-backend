@@ -6,11 +6,11 @@ let line = 1
 /**
  * This stream returns non-ISO 8859-1 characters
  */
-module.exports = new Transform({
+module.exports = () => new Transform({
     readableObjectMode: true,
 
     transform(chunk, encoding, callback) {
-        const chunkString = chunk.toString()
+        const chunkString = chunk.toString('latin1')
         const chunkArray = Array.from(chunkString)
         chunkArray.forEach((c, i) => {
             if (c.match('\n')) line ++
@@ -30,7 +30,7 @@ module.exports = new Transform({
             }
         })
 
-        callback()
+        return void callback()
     }
 })
 
