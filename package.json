@@ -17,11 +17,14 @@
   },
   "homepage": "https://github.com/botflux/file-plateform-backend#readme",
   "dependencies": {
+    "@botflx/data-converter": "0.0.1",
     "body-parser": "^1.18.3",
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "express-fileupload": "^1.1.1-alpha.2",
-    "stream-buffers": "^3.0.2"
+    "fast-csv": "^2.4.1",
+    "stream-buffers": "^3.0.2",
+    "xml-js": "^1.6.11"
   },
   "devDependencies": {
     "jest": "^24.1.0"
