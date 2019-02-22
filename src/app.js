@@ -10,7 +10,7 @@ const convert = require('xml-js')
 const fs = require('fs')
 const path = require('path')
 
-const isCSV = (extension, mimetype) => (extension === 'csv' && (mimetype === 'text/csv' || mimetype === 'application/csv'))
+const isCSV = (extension, mimetype) => (extension === 'csv' || (mimetype === 'text/csv' || mimetype === 'application/csv'))
 
 const app = express()
 
@@ -91,6 +91,8 @@ app.post('/csv-to-xml/get-headers', (req, res) => {
 
     // extract the extension from the filename
     let [ extension = '', ...rest ] = file.name.split('.').reverse()
+
+    console.log(extension, file.mimetype)
 
     // if the file is not a CSV file then we return directly a message
     if (!isCSV(extension, file.mimetype)) {
