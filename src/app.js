@@ -6,6 +6,7 @@ const characterChecker = require('./character-checker')
 const { Readable } = require('stream')
 const csv = require('fast-csv')
 const converter = require('@botflx/data-converter')
+const filters = require('./csv-to-xml/filters')
 const convert = require('xml-js')
 const fs = require('fs')
 const path = require('path')
@@ -129,7 +130,8 @@ app.post('/csv-to-xml/get-headers', (req, res) => {
             res.json({
                 status: 200,
                 body: {
-                    headers: firstLine
+                    headers: firstLine,
+                    filters
                 }
             })
         })
@@ -198,8 +200,9 @@ app.post('/csv-to-xml', (req, res) => {
 
     // stores all transformed objects
     let transformedObjects = []
-
     
+    console.log(JSON.stringify(fields, null, 4))
+
     readStream
         /**
          * We pipe the CSV parser stream,
@@ -215,7 +218,8 @@ app.post('/csv-to-xml', (req, res) => {
          * This stream is here to transform to filter and transform data
          */
         .pipe(converter({
-            fields
+            fields,
+            filters
         }))
         /**
          * Each time the converter stream process an object, we add it to the array
