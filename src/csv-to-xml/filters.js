@@ -1,5 +1,5 @@
 const reverse = {
-    process: ( v ) => {
+    process: ( v = '' ) => {
         return (
             Array.from (v)
                 .reverse()
@@ -13,7 +13,7 @@ const reverse = {
 }
 
 const getWords = {
-    process: ( v, { word } ) => {
+    process: ( v = '', { word } ) => {
         return (
             v.split(' ')[word]
         ) || ''
