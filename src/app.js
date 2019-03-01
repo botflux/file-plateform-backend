@@ -38,6 +38,7 @@ app.post('/character-checker', (req, res) => {
     // if it is not defined then we return a response
     if (file === undefined || file === null || Object.keys(file) == 0) {
         return res.json({
+            status: 400,
             message: 'You need to upload a file'
         })
     }
@@ -62,7 +63,6 @@ app.post('/character-checker', (req, res) => {
         // we just add this object to an array
         .on('data', o => { 
             issues = [...issues, ...[{...o, ...{id: id++}}]] 
-            console.log(o)
         })
         // when every issues are found we returns the array as a JSON.
         .on('end', () => {
