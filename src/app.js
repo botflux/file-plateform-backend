@@ -187,6 +187,8 @@ app.post('/csv-to-xml', (req, res) => {
     map = JSON.parse(map)
 
     // we extract field and assign a default value to them
+    const attrs = map.attributes
+
     const { fields = [], documentRoot = 'Root', collectionRoot = 'Element', attributes = {}, declarations = {} } = map
 
     console.log(map, file)
@@ -235,16 +237,19 @@ app.post('/csv-to-xml', (req, res) => {
         .on('end', () => {
             console.log('end', transformedObjects)
 
+            console.log(attributes, attrs)
+
             let resultObject = {
-                [documentRoot]: {
-                    _attributes: attributes,
-                    [collectionRoot]: transformedObjects
+                _declaration: {
+                    _attributes: declarations
                 }
             }
 
-            if (Object.keys(declarations) === 0) {
-                resultObject._declaration = {
-                    _attributes: declarations
+            resultObject = {
+                ...resultObject,
+                [documentRoot]: {
+                    _attributes: attributes,
+                    [collectionRoot]: transformedObjects
                 }
             }
 
