@@ -62,7 +62,10 @@ app.post('/character-checker', (req, res) => {
         // checker stream returns objects containing information about the issue
         // we just add this object to an array
         .on('data', o => { 
-            issues = [...issues, ...[{...o, ...{id: id++}}]] 
+            issues = [ 
+                ...issues, 
+                { ...o, id: id++ } 
+            ] 
         })
         // when every issues are found we returns the array as a JSON.
         .on('end', () => {
