@@ -10,8 +10,7 @@ const filters = require('./csv-to-xml/filters')
 const convert = require('xml-js')
 const fs = require('fs')
 const path = require('path')
-
-const isCSV = (extension, mimetype) => (extension === 'csv' || (mimetype === 'text/csv' || mimetype === 'application/csv'))
+const isCSV = require('./is-csv')
 
 const app = express()
 
