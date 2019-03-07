@@ -2,7 +2,6 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const fileUpload = require('express-fileupload')
 const cors = require('cors')
-const characterChecker = require('./character-checker')
 const { Readable } = require('stream')
 const csv = require('fast-csv')
 const converter = require('@botflx/data-converter')
@@ -11,6 +10,7 @@ const convert = require('xml-js')
 const fs = require('fs')
 const path = require('path')
 const isCSV = require('./is-csv')
+const characterCheckerRoute = require('./routes/character-checker')
 
 const app = express()
 
@@ -26,54 +26,7 @@ app.use(fileUpload())
 
 app.use(express.static('/result'))
 
-app.post('/character-checker', (req, res) => {
-    
-    // get all files from this request
-    const { files = {} } = req
-
-    // get the file named 'file'
-    const { file = {} } = files || {}
-
-    // if it is not defined then we return a response
-    if (file === undefined || file === null || Object.keys(file) == 0) {
-        return res.json({
-            status: 400,
-            message: 'You need to upload a file'
-        })
-    }
-
-    // will store all character issues found inside the file
-    let issues = []
-
-    // instatiate a new character checker stream
-    const checker = characterChecker()
-
-    // instantiate the stream which will carry the file buffer
-    const stream = new Readable()
-    stream.push(file.data)
-    // end of stream
-    stream.push(null)
-
-    let id = 0
-
-    stream
-        .pipe(checker)
-        // checker stream returns objects containing information about the issue
-        // we just add this object to an array
-        .on('data', o => { 
-            issues = [ 
-                ...issues, 
-                { ...o, id: id++ } 
-            ] 
-        })
-        // when every issues are found we returns the array as a JSON.
-        .on('end', () => {
-            res.json({
-                message: 'Ok',
-                result: issues
-            })
-        })
-})
+app.post('/character-checker', characterCheckerRoute.index)
 
 app.post('/csv-to-xml/get-headers', (req, res) => {
 
@@ -129,6 +82,7 @@ app.post('/csv-to-xml/get-headers', (req, res) => {
         })
         // when the stream is finished, we send back the headers
         .on('end', () => {
+            console.log(firstLine)
             res.json({
                 status: 200,
                 body: {
@@ -150,7 +104,6 @@ app.get('/csv-to-xml/converted/:name', (req, res) => {
             }
         })
     }
-
 })
 
 app.post('/csv-to-xml', (req, res) => {
