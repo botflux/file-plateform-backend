@@ -4,6 +4,24 @@ const fileUpload = require('express-fileupload')
 const cors = require('cors')
 const characterCheckerRoutes = require('./routes/character-checker')
 const CSVToXMLRoutes = require('./routes/csv-to-xml')
+const { MongoClient } = require('mongodb')
+const uri = process.env.FILE_PLATEFORM_DB_URI
+
+const client = new MongoClient(uri, {
+    useNewUrlParser: true
+})
+
+client.connect(err => {
+    if (err) console.log('e0', err)
+    let a = []
+    const collection = client.db('file-plateform').collection('test')
+    collection.find().forEach((doc, e) => {
+        if (e) console.log('e1', e) 
+        a.push(doc) 
+        console.log(doc)
+    })
+    client.close()
+})
 
 const app = express()
 
