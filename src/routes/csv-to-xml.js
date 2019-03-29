@@ -8,85 +8,9 @@ const converter = require('@botflx/data-converter')
 const convert = require('xml-js')
 const { Router } = require('express')
 
-const getHeaders = (req, res) => {
+const router = new Router()
 
-    const { files = {} } = req
-    const { file = {} } = files
-
-    // if there is not file we return a message
-    if (Object.keys(file).length === 0) {
-        return res.json({
-            status: 404,
-            body: {
-                message: 'A file need to be sent !'
-            }
-        })
-    }
-
-    console.log(file)
-
-    // extract the extension from the filename
-    let [ extension = '', ...rest ] = file.name.split('.').reverse()
-
-    console.log(extension, file.mimetype)
-
-    // if the file is not a CSV file then we return directly a message
-    if (!isCSV(extension, file.mimetype)) {
-        return res.json({
-            status: 404,
-            body: {
-                message: 'The file should be of type CSV !'
-            }
-        })
-    }
-
-    // create a new stream each time
-    const readStream = new Readable()
-    // we push the content of the file inside the stream
-    readStream.push(file.data.toString('latin1'))
-    // tell that its the end of the stream
-    readStream.push(null)
-
-    // will store the first line of the csv
-    let firstLine = null
-
-    // pipe the csv transform stream to readStream
-    readStream
-        .pipe(csv({
-            delimiter: ';'
-        }))
-        // when the csv stream emit a data
-        .on('data', (chunk) => {
-            // the first line will be stored
-            if (firstLine === null) firstLine = chunk
-        })
-        // when the stream is finished, we send back the headers
-        .on('end', () => {
-            console.log(firstLine)
-            res.json({
-                status: 200,
-                body: {
-                    headers: firstLine,
-                    filters
-                }
-            })
-        })
-}
-
-const download = (req, res) => {
-    if (fs.existsSync(`result/${req.params.name}`)) {
-        return res.type('text/xml').download(path.resolve(`result/${req.params.name}`))
-    } else {
-        return res.json({
-            status: 400,
-            body: {
-                message: 'File not found !'
-            }
-        })
-    }
-}
-
-const index = (req, res) => {
+router.post('/', (req, res) => {
 
     // get all sent file as an object
     const { files = {} } = req
@@ -203,12 +127,82 @@ const index = (req, res) => {
                 })
             })
         })
-}
+})
+router.post('/get-headers', (req, res) => {
 
-const router = new Router()
+    const { files = {} } = req
+    const { file = {} } = files
 
-router.post('/', index)
-router.post('/get-headers', getHeaders)
-router.get('/converted/:name', download)
+    // if there is not file we return a message
+    if (Object.keys(file).length === 0) {
+        return res.json({
+            status: 404,
+            body: {
+                message: 'A file need to be sent !'
+            }
+        })
+    }
+
+    console.log(file)
+
+    // extract the extension from the filename
+    let [ extension = '', ...rest ] = file.name.split('.').reverse()
+
+    console.log(extension, file.mimetype)
+
+    // if the file is not a CSV file then we return directly a message
+    if (!isCSV(extension, file.mimetype)) {
+        return res.json({
+            status: 404,
+            body: {
+                message: 'The file should be of type CSV !'
+            }
+        })
+    }
+
+    // create a new stream each time
+    const readStream = new Readable()
+    // we push the content of the file inside the stream
+    readStream.push(file.data.toString('latin1'))
+    // tell that its the end of the stream
+    readStream.push(null)
+
+    // will store the first line of the csv
+    let firstLine = null
+
+    // pipe the csv transform stream to readStream
+    readStream
+        .pipe(csv({
+            delimiter: ';'
+        }))
+        // when the csv stream emit a data
+        .on('data', (chunk) => {
+            // the first line will be stored
+            if (firstLine === null) firstLine = chunk
+        })
+        // when the stream is finished, we send back the headers
+        .on('end', () => {
+            console.log(firstLine)
+            res.json({
+                status: 200,
+                body: {
+                    headers: firstLine,
+                    filters
+                }
+            })
+        })
+})
+router.get('/converted/:name', (req, res) => {
+    if (fs.existsSync(`result/${req.params.name}`)) {
+        return res.type('text/xml').download(path.resolve(`result/${req.params.name}`))
+    } else {
+        return res.json({
+            status: 400,
+            body: {
+                message: 'File not found !'
+            }
+        })
+    }
+})
 
 module.exports = router
