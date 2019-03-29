@@ -1,7 +1,10 @@
 const characterChecker = require('../character-checker')
 const { Readable } = require('stream')
+const { Router } = require('express')
 
-const index = (req, res) => {
+const router = new Router()
+
+router.post('/', (req, res) => {
     
     // get all files from this request
     const { files = {} } = req
@@ -48,8 +51,6 @@ const index = (req, res) => {
                 result: issues
             })
         })
-}
+})
 
-module.exports = {
-    index
-}
+module.exports = router
