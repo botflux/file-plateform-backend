@@ -3,7 +3,8 @@ const bodyParser = require('body-parser')
 const fileUpload = require('express-fileupload')
 const cors = require('cors')
 const characterCheckerRoutes = require('./routes/character-checker')
-const CSVToXMLRoutes = require('./routes/csv-to-xml')
+// const CSVToXMLRoutes = require('./routes/csv-to-xml')
+const CSVToXMLRouter = require('./routes/csv-to-xml')
 
 const app = express()
 
@@ -29,8 +30,10 @@ app.use(express.static('/result'))
 
 app.post('/character-checker', characterCheckerRoutes.index)
 
-app.post('/csv-to-xml/get-headers', CSVToXMLRoutes.getHeaders)
-app.get('/csv-to-xml/converted/:name', CSVToXMLRoutes.download)
-app.post('/csv-to-xml', CSVToXMLRoutes.index)
+app.use('/csv-to-xml', CSVToXMLRouter)
+
+// app.post('/csv-to-xml/get-headers', CSVToXMLRoutes.getHeaders)
+// app.get('/csv-to-xml/converted/:name', CSVToXMLRoutes.download)
+// app.post('/csv-to-xml', CSVToXMLRoutes.index)
 
 module.exports = app

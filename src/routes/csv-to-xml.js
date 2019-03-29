@@ -6,6 +6,7 @@ const fs = require('fs')
 const path = require('path')
 const converter = require('@botflx/data-converter')
 const convert = require('xml-js')
+const { Router } = require('express')
 
 const getHeaders = (req, res) => {
 
@@ -204,8 +205,10 @@ const index = (req, res) => {
         })
 }
 
-module.exports = {
-    getHeaders,
-    download,
-    index
-}
+const router = new Router()
+
+router.post('/', index)
+router.post('/get-headers', getHeaders)
+router.get('/converted/:name', download)
+
+module.exports = router
