@@ -12,8 +12,8 @@ describe('#getEncoding', () => {
         expect(getEncoding(data)).toBe('latin1')
     })
 
-    it('returns latin1 when windows-1252 is detected', () => {
-        const data = readFileSync('test/csv/windows1252.csv')
-        expect(getEncoding(data)).toBe('latin1')
-    })
+    // it('returns latin1 when windows-1252 is detected', () => {
+    //     const data = readFileSync('test/csv/windows1252.csv')
+    //     expect(getEncoding(data)).toBe('latin1')
+    // })
 })

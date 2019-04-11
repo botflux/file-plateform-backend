@@ -10,7 +10,7 @@ const getEncoding = buffer => {
 
     return (detectedEncoding.toLowerCase() === 'utf-8') 
         ? 'utf8' : (detectedEncoding.toLowerCase() === 'iso-8859-1') 
-        ? 'latin1' : (detectedEncoding.toLowerCase() === 'windows-1252')
+        // ? 'latin1' : (detectedEncoding.toLowerCase() === 'windows-1252')
         ? 'latin1' : detectedEncoding
 }
 
