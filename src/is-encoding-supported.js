@@ -3,9 +3,9 @@
  * 
  * @param {String} encoding Encoding you want to check
  */
-const encodingIsSupported = encoding => (
+const isEncodingSupported = encoding => (
     encoding === 'latin1' ||
     encoding === 'utf8'
 )
 
-module.exports = encodingIsSupported
+module.exports = isEncodingSupported

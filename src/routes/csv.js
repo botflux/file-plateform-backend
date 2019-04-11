@@ -4,6 +4,7 @@ const isCSV = require('../is-csv')
 const { Readable } = require('stream')
 const getFileExtension = require('../get-file-extension')
 const getEncoding = require('../get-encoding')
+const isEncodingSupported = require('../is-encoding-supported')
 
 const router = new Router()
 
@@ -26,6 +27,8 @@ router.post('/read-headers', (req, res) => {
             .status(400)
             .send('File is not a CSV')
     }
+
+
 
     const readable = new Readable()
     readable.push(file.data.toString(getEncoding(file.data)))
