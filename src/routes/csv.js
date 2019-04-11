@@ -28,10 +28,16 @@ router.post('/read-headers', (req, res) => {
             .send('File is not a CSV')
     }
 
+    const encoding = getEncoding(file.data)
 
+    if (!isEncodingSupported(encoding)) {
+        return res 
+            .status(400)
+            .send('Encoding is not supported')
+    }
 
     const readable = new Readable()
-    readable.push(file.data.toString(getEncoding(file.data)))
+    readable.push(file.data.toString(encoding))
     readable.push(null)
 
     readable

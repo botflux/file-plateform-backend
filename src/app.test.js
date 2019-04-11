@@ -96,6 +96,15 @@ describe('CSV routes', () => {
                     expect(res.type).toBe('text/html')
                 })
         })
+
+        it('returns a 400 when the sent file is not using a supported encoding', () => {
+            return request(app)
+                .post('/csv/read-headers')
+                .then(res => {
+                    expect(res.statusCode).toBe(400)
+                    expect(res.type).toBe('text/html')
+                })
+        })
     })
 })
 
