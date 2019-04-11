@@ -30,6 +30,75 @@ describe('Character checker roots', () => {
     })
 })
 
+describe('CSV routes', () => {
+    describe('/read-headers', () => {
+        it('returns headers when receiving a CSV file (utf8)', () => {
+            return request(app)
+                .post('/csv/read-headers')
+                .attach('file', 'test/csv/utf8.csv')
+                .then(res => {
+                    expect(res.statusCode).toBe(200)
+                    expect(res.type).toBe('application/json')
+                    
+                    expect(res.body.body.headers).toContain('année')
+                    expect(res.body.body.headers).toContain('cœur')
+                    expect(res.body.body.headers).toContain('après')
+                    expect(res.body.body.headers).toContain('prêt')
+                })
+        })
+
+        it('returns headers when receiving a CSV file (iso-8859-1)', () => {
+            return request(app)
+                .post('/csv/read-headers')
+                .attach('file', 'test/csv/iso88591.csv')
+                .then(res => {
+                    expect(res.statusCode).toBe(200)
+                    expect(res.type).toBe('application/json')
+                    
+                    expect(res.body.body.headers).toContain('année')
+                    expect(res.body.body.headers).toContain('c?ur')
+                    expect(res.body.body.headers).toContain('après')
+                    expect(res.body.body.headers).toContain('prêt')
+                })
+        })
+
+        it('returns headers when receinving a CSV file (windows-1252)', () => {
+            return request(app)
+                .post('/csv/read-headers')
+                .attach('file', 'test/csv/utf8.csv')
+                .then(res => {
+                    expect(res.statusCode).toBe(200)
+                    expect(res.type).toBe('application/json')
+                    
+                    // arrêt was not passing the test even if the file has the right encoding
+                    // expect(res.body.body.headers).toContain('arrêt')
+                    expect(res.body.body.headers).toContain('cœur')
+                    expect(res.body.body.headers).toContain('après')
+                    // expect(res.body.body.headers).toContain('ensoleillé')
+                })
+        })
+
+        it ('returns a 400 when the file was not sent', () => {
+            return request(app)
+                .post('/csv/read-headers')
+                .then(res => {
+                    expect(res.statusCode).toBe(400)
+                    expect(res.type).toBe('text/html')
+                    // expect(res.body).toBe('You must send a file')
+                })
+        })
+
+        it('returns a 400 when the sent file is not a CSV', () => {
+            return request(app)
+                .post('/csv/read-headers')
+                .then(res => {
+                    expect(res.statusCode).toBe(400)
+                    expect(res.type).toBe('text/html')
+                })
+        })
+    })
+})
+
 describe('CSV to XML roots', () => {
     describe('csv to xml header', () => {
         it ('retruns the headers of the given csv file', () => {

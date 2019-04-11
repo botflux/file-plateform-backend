@@ -7,6 +7,8 @@ const characterCheckerRouter = require('./routes/character-checker')
 // const CSVToXMLRoutes = require('./routes/csv-to-xml')
 const CSVToXMLRouter = require('./routes/csv-to-xml')
 
+const CSVRouter = require('./routes/csv')
+
 const app = express()
 
 // middleware to add cors headers
@@ -33,6 +35,8 @@ app.use(express.static('/result'))
 app.use('/character-checker', characterCheckerRouter)
 
 app.use('/csv-to-xml', CSVToXMLRouter)
+
+app.use('/csv', CSVRouter)
 
 // app.post('/csv-to-xml/get-headers', CSVToXMLRoutes.getHeaders)
 // app.get('/csv-to-xml/converted/:name', CSVToXMLRoutes.download)
