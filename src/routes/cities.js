@@ -10,8 +10,13 @@ const fetch = require('node-fetch')
 const makeCityExists = require('../cities/city-exists')
 const makeCountyExists = require('../cities/county-exists')
 const JSONStream = require('JSONStream')
+const makeFileExistsMiddleware = require('../middleware/make-files-exists')
 
 const router = new Router()
+
+router.use('/exists', makeFileExistsMiddleware([
+    'file'
+]))
 
 router.post('/exists', (req, res) => {
     let { columnNames = '' } = req.body
@@ -31,11 +36,11 @@ router.post('/exists', (req, res) => {
     const { files = {} } = req
     const { file } = files || {}
 
-    if (!file) {
-        return res
-            .status(400)
-            .send('You must send a file')
-    }
+    // if (!file) {
+    //     return res
+    //         .status(400)
+    //         .send('You must send a file')
+    // }
 
     if (!isCSV(getFileExtension(file.name), file.mimetype)) {
         return res

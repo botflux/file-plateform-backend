@@ -166,7 +166,7 @@ describe('/cities', () => {
                 .send('columnNames=a')
                 .then(res => {
                     expect(res.statusCode).toBe(400)
-                    expect(res.text).toBe('You must send a file')
+                    expect(res.text).toBe('The file file is missing')
                 })
         })
         it ('returns a 400 when the file is not a CSV', () => {
@@ -192,6 +192,7 @@ describe('/cities', () => {
         it ('returns a 400 when the column names are not sent', () => {
             return request(app)
                 .post(uri)
+                .attach('file', 'test/csv/utf8.csv')
                 .then(res => {
                     expect(res.statusCode).toBe(400)
                     expect(res.text).toBe('No column names sent')
