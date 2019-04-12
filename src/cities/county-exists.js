@@ -3,8 +3,8 @@ const makeCountyExists = (fetch, encodeURIComponent) => countyName => {
         return Promise.reject('#countyExists: countyName must be a string')
 
     const countyParameter = encodeURIComponent(countyName)
-
-    return fetch(`https://geo.api.gouv.fr/departements?nom=${countyParameter}?fields=nom`)
+    
+    return fetch(`https://geo.api.gouv.fr/departements?nom=${countyParameter}&fields=nom`)
         .then(response => response.json())
         .then(data => ( data.length > 0 ))
 }

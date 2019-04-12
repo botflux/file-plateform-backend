@@ -35,7 +35,7 @@ describe('#countyExists', () => {
 
     it('uses the encoded url', () => {
         const fakeFetch = jest.fn(url => {
-            expect(url).toBe('https://geo.api.gouv.fr/departements?nom=un%20departement?fields=nom')
+            expect(url).toBe('https://geo.api.gouv.fr/departements?nom=un%20departement&fields=nom')
 
             return Promise.resolve({
                 json () {
