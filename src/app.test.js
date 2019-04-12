@@ -155,3 +155,69 @@ describe('CSV to XML roots', () => {
         })
     })
 })
+
+describe('/cities', () => {
+    describe('POST /cities/exists', () => {
+        const uri = '/cities/exists'
+
+        it ('returns a 400 when there is no file', () => {
+            return request(app)
+                .post(uri)
+                .send('columnNames=a')
+                .then(res => {
+                    expect(res.statusCode).toBe(400)
+                    expect(res.text).toBe('You must send a file')
+                })
+        })
+        it ('returns a 400 when the file is not a CSV', () => {
+            return request(app)
+                .post(uri)
+                .attach('file', 'test/test.txt')
+                .field('columnNames', 'a')
+                .then(res => {
+                    expect(res.statusCode).toBe(400)
+                    expect(res.text).toBe('The sent file is not a CSV')
+                })
+        })
+        it ('returns a 400 when the file is using an unsupported encoding', () => {
+            return request(app)
+                .post(uri)
+                .attach('file', 'test/csv/windows1252.csv')
+                .field('columnNames', 'c')
+                .then(res => {
+                    expect(res.statusCode).toBe(400)
+                    expect(res.text).toBe('Wrong encoding')
+                })
+        })
+        it ('returns a 400 when the column names are not sent', () => {
+            return request(app)
+                .post(uri)
+                .then(res => {
+                    expect(res.statusCode).toBe(400)
+                    expect(res.text).toBe('No column names sent')
+                })
+        })
+        it ('returns errors in csv when there is one column name', () => {
+            return request(app)
+                .post(uri)
+                .attach('file', 'test/cities/simple-column.csv')
+                .field('columnNames', 'place')
+                .then(res => {
+                    expect(res.statusCode).toBe(200)
+                    expect(res.type).toMatch(/json/)
+                    expect(res.body.length).toBe(2)
+                })
+        })
+        it ('returns errors in csv when there is multiple column name', () => {
+            return request(app)
+                .post(uri)
+                .attach('file', 'test/cities/double-columns.csv')
+                .field('columnNames', 'place,place2')
+                .then(res => {
+                    expect(res.statusCode).toBe(200)
+                    expect(res.type).toMatch(/json/)
+                    expect(res.body.length).toBe(4)
+                })
+        })
+    }) 
+})
