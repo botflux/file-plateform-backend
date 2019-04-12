@@ -1,8 +1,8 @@
 const request = require('supertest')
 const app = require('./app')
 
-describe('Character checker roots', () => {
-    describe ('Character checker', () => {
+describe('/character-checker', () => {
+    describe ('POST /character-checker/', () => {
         it ('returns the invalid characters (happy path)', () => {
             return request(app)
                 .post('/character-checker')
@@ -30,8 +30,8 @@ describe('Character checker roots', () => {
     })
 })
 
-describe('CSV routes', () => {
-    describe('/read-headers', () => {
+describe('/csv', () => {
+    describe('POST /csv/read-headers', () => {
         it('returns headers when receiving a CSV file (utf8)', () => {
             return request(app)
                 .post('/csv/read-headers')
@@ -108,8 +108,8 @@ describe('CSV routes', () => {
     })
 })
 
-describe('CSV to XML roots', () => {
-    describe('csv to xml header', () => {
+describe('/csv-to-xml', () => {
+    describe('POST /csv-to-xml/get-headers', () => {
         it ('retruns the headers of the given csv file', () => {
             return request(app)
                 .post('/csv-to-xml/get-headers')
