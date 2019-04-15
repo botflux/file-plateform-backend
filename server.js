@@ -1,4 +1,6 @@
-const app = require('./src/app')
+const app = require('./src/make-app')({
+    fetch: require('node-fetch')
+})
 const APPLICATION_PORT = process.env.PORT || 3000
 
 app.listen(APPLICATION_PORT, () => {

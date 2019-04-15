@@ -1,5 +1,11 @@
 const request = require('supertest')
-const app = require('./app')
+const makeApp = require('./make-app')
+
+const app = makeApp({
+    fetch: () => Promise.resolve({
+        json: () => {}
+    })
+})
 
 describe('/character-checker', () => {
     describe ('POST /character-checker/', () => {
@@ -199,6 +205,19 @@ describe('/cities', () => {
                 })
         })
         it ('returns errors in csv when there is one column name', () => {
+            const json = jest.fn()
+            json
+                .mockReturnValueOnce([''])
+                .mockReturnValueOnce([])
+                .mockResolvedValueOnce([''])
+                .mockReturnValueOnce([])
+
+            const app = makeApp({
+                fetch: () => Promise.resolve({
+                    json
+                })
+            })
+
             return request(app)
                 .post(uri)
                 .attach('file', 'test/cities/simple-column.csv')
@@ -210,6 +229,24 @@ describe('/cities', () => {
                 })
         })
         it ('returns errors in csv when there is multiple column name', () => {
+            const json = jest.fn()
+
+            json
+                .mockReturnValueOnce([])
+                .mockReturnValueOnce([''])
+                .mockReturnValueOnce([''])
+                .mockReturnValueOnce([])
+                .mockReturnValueOnce([''])
+                .mockReturnValueOnce([''])
+                .mockReturnValueOnce([])
+                .mockReturnValueOnce([])
+                
+            const app = makeApp({
+                fetch: () => Promise.resolve({
+                    json
+                })
+            })
+
             return request(app)
                 .post(uri)
                 .attach('file', 'test/cities/double-columns.csv')
