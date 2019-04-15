@@ -1,13 +1,20 @@
 const { Readable } = require('stream')
-const csv = require('fast-csv')
-const isCSV = require('../is-csv')
-const filters = require('../csv-to-xml/filters')
-const fs = require('fs')
 const path = require('path')
+const fs = require('fs')
+
+const csv = require('fast-csv')
 const converter = require('@botflx/data-converter')
 const convert = require('xml-js')
 const { Router } = require('express')
 
+const isCSV = require('../is-csv')
+const filters = require('../csv-to-xml/filters')
+
+/**
+ * Construct the CSV to XML router
+ * 
+ * @returns {Router}
+ */
 const makeCSVToXMLRouter = () => {
         
     const router = new Router()
@@ -194,6 +201,9 @@ const makeCSVToXMLRouter = () => {
                 })
             })
     })
+    /**
+     * TODO: refactor sync code
+     */
     router.get('/converted/:name', (req, res) => {
         if (fs.existsSync(`result/${req.params.name}`)) {
             return res.type('text/xml').download(path.resolve(`result/${req.params.name}`))

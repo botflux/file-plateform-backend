@@ -1,7 +1,12 @@
-const characterChecker = require('../character-checker')
 const { Readable } = require('stream')
 const { Router } = require('express')
+const characterChecker = require('../character-checker')
 
+/**
+ * Construct the character checker router
+ * 
+ * @returns {Router}
+ */
 const makeCharacterCheckerRouter = () => {    
     const router = new Router()
 

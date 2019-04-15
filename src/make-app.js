@@ -1,16 +1,24 @@
 const express = require('express')
+
+/** Imports middleware */
 const bodyParser = require('body-parser')
 const fileUpload = require('express-fileupload')
 const cors = require('cors')
-// const characterCheckerRoutes = require('./routes/character-checker')
+/** */
+
+/** Imports routers */
 const makeCharacterCheckerRouter = require('./routes/make-character-checker-router')
-// const CSVToXMLRoutes = require('./routes/csv-to-xml')
 const makeCSVToXMLRouter = require('./routes/make-csv-to-xml-router')
 const makeCSVRouter = require('./routes/make-csv-router')
 const makeCitiesRouter = require('./routes/make-cities-router')
+/** */
 
+/**
+ * Takes the app dependencies as an object and returns the app
+ * 
+ * @param {{}} params An object containing the app dependencies
+ */
 const makeApp = ({ fetch }) => {
-    // console.log(makeCSVToXMLRouter())
     const app = express()
 
     // middleware to add cors headers
@@ -33,13 +41,14 @@ const makeApp = ({ fetch }) => {
     // expose the /result folder
     app.use(express.static('/result'))
 
+    /**
+     * Expose routers
+     */
     app.use('/character-checker', makeCharacterCheckerRouter())
-
     app.use('/csv-to-xml', makeCSVToXMLRouter())
-
     app.use('/csv', makeCSVRouter())
-
-    app.use('/cities', makeCitiesRouter(fetch))
+    app.use('/cities', makeCitiesRouter({ fetch }))
+    /** */
 
     return app
 }

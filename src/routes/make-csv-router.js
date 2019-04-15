@@ -1,11 +1,16 @@
+const { Readable } = require('stream')
+
 const { Router } = require('express')
 const csv = require('fast-csv')
+
 const isCSV = require('../is-csv')
-const { Readable } = require('stream')
 const getFileExtension = require('../get-file-extension')
 const getEncoding = require('../get-encoding')
 const isEncodingSupported = require('../is-encoding-supported')
 
+/**
+ * Make CSV router
+ */
 const makeCSVRouter = () => {
     
     const router = new Router()
@@ -13,8 +18,6 @@ const makeCSVRouter = () => {
     router.post('/read-headers', (req, res) => {
         const { files = {} } = req
         const { file } = files || {}
-
-        console.log(file)
 
         if (!file) {
             return res

@@ -1,17 +1,24 @@
+const { Readable } = require('stream')
+
 const { Router } = require('express')
+const csv = require('fast-csv')
+const JSONStream = require('JSONStream')
+
+const makeFileExistsMiddleware = require('../middleware/make-files-exists')
 const isCSV = require('../is-csv')
 const isEncodingSupported = require('../is-encoding-supported')
 const getFileExtension = require('../get-file-extension')
 const getEncoding = require('../get-encoding')
-const { Readable } = require('stream')
-const csv = require('fast-csv')
 const cityVerificationStream = require('../cities/exists-stream')
 const makeCityExists = require('../cities/city-exists')
 const makeCountyExists = require('../cities/county-exists')
-const JSONStream = require('JSONStream')
-const makeFileExistsMiddleware = require('../middleware/make-files-exists')
 
-const makeCitiesRouter = fetch => {
+/**
+ * Construct the router from it dependecies
+ * 
+ * @param {{}} dependencies An object containing router dependencies 
+ */
+const makeCitiesRouter = ({ fetch }) => {
         
     const router = new Router()
 
