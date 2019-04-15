@@ -4,7 +4,7 @@ const { Router } = require('express')
 const csv = require('fast-csv')
 const JSONStream = require('JSONStream')
 
-const makeFileExistsMiddleware = require('../middleware/make-files-exists')
+const makeFileExistsMiddleware = require('../middleware/make-files-exists-middleware')
 const isCSV = require('../is-csv')
 const isEncodingSupported = require('../is-encoding-supported')
 const getFileExtension = require('../get-file-extension')

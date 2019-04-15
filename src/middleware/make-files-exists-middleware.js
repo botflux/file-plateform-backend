@@ -4,7 +4,7 @@
  * 
  * @param {[]} filenames An array containing all the filename
  */
-const makeFileExists = filenames => (req, res, next) => {
+const makeFileExistsMiddleware = filenames => (req, res, next) => {
     const { files = {} } = req
     
     filenames.forEach(filename => {
@@ -18,4 +18,4 @@ const makeFileExists = filenames => (req, res, next) => {
     next()
 }
 
-module.exports = makeFileExists
+module.exports = makeFileExistsMiddleware
