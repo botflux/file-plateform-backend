@@ -1,6 +1,8 @@
 const { Readable } = require('stream')
 const { Router } = require('express')
+
 const characterChecker = require('../character-checker')
+const makeFileExistsMiddleware = require('../middleware/make-files-exists-middleware')
 
 /**
  * Construct the character checker router
@@ -9,6 +11,8 @@ const characterChecker = require('../character-checker')
  */
 const makeCharacterCheckerRouter = () => {    
     const router = new Router()
+
+    router.use('/', makeFileExistsMiddleware([ 'file' ]))
 
     router.post('/', (req, res) => {
         
@@ -19,12 +23,12 @@ const makeCharacterCheckerRouter = () => {
         const { file = {} } = files
 
         // if it is not defined then we return a response
-        if (file === undefined || file === null || Object.keys(file) == 0) {
-            return res.json({
-                status: 400,
-                message: 'You need to upload a file'
-            })
-        }
+        // if (file === undefined || file === null || Object.keys(file) == 0) {
+        //     return res.json({
+        //         status: 400,
+        //         message: 'You need to upload a file'
+        //     })
+        // }
 
         // will store all character issues found inside the file
         let issues = []

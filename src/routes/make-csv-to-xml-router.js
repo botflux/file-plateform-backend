@@ -9,6 +9,7 @@ const { Router } = require('express')
 
 const isCSV = require('../is-csv')
 const filters = require('../csv-to-xml/filters')
+const makeFileExistsMiddleware = require('../middleware/make-files-exists-middleware')
 
 /**
  * Construct the CSV to XML router
@@ -19,6 +20,8 @@ const makeCSVToXMLRouter = () => {
         
     const router = new Router()
 
+    router.use('/', makeFileExistsMiddleware([ 'file' ]))
+
     router.post('/', (req, res) => {
 
         // get all sent file as an object
@@ -26,17 +29,6 @@ const makeCSVToXMLRouter = () => {
 
         // get the file named file (in the form)
         const { file = {} } = files || {}
-
-        // if there is no file sent then we return
-        if (Object.keys(file).length === 0) {
-            return res.json({
-                status: 400,
-                body: {
-                    message: 'You need to send a file !'
-                }
-            })
-        }
-
         // we get the extension
         const [ extension, ...rest ] = file.name.split('.').reverse()
 
@@ -137,20 +129,13 @@ const makeCSVToXMLRouter = () => {
                 })
             })
     })
+
+    router.use('/get-headers', makeFileExistsMiddleware([ 'file' ]))
+
     router.post('/get-headers', (req, res) => {
 
         const { files = {} } = req
-        const { file = {} } = files
-
-        // if there is not file we return a message
-        if (Object.keys(file).length === 0) {
-            return res.json({
-                status: 404,
-                body: {
-                    message: 'A file need to be sent !'
-                }
-            })
-        }
+        const { file } = files
 
         console.log(file)
 

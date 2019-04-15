@@ -25,12 +25,8 @@ describe('/character-checker', () => {
             return request(app)
                 .post('/character-checker')
                 .then(res => {
-                    expect(res.statusCode).toBe(200)
-                    expect(res.type).toBe('application/json')
-                    expect('message' in res.body).toBe(true)
-                    expect(res.body.message).toBe('You need to upload a file')
-                    expect('status' in res.body).toBe(true)
-                    expect(res.body.status).toBe(400)
+                    expect(res.statusCode).toBe(400)
+                    expect(res.text).toBe('The file file is missing')
                 })
         })
     })
@@ -89,7 +85,7 @@ describe('/csv', () => {
                 .post('/csv/read-headers')
                 .then(res => {
                     expect(res.statusCode).toBe(400)
-                    expect(res.type).toBe('text/html')
+                    expect(res.text).toBe('The file file is missing')
                     // expect(res.body).toBe('You must send a file')
                 })
         })
@@ -115,6 +111,17 @@ describe('/csv', () => {
 })
 
 describe('/csv-to-xml', () => {
+    describe('POST /csv-to-xml/', () => {
+        it ('returns an error when the file is not given', () => {
+            return request(app)
+                .post('/csv-to-xml')
+                .then(res => {
+                    expect(res.statusCode).toBe(400)
+                    expect(res.text).toBe('The file file is missing')
+                })
+        })
+    })
+
     describe('POST /csv-to-xml/get-headers', () => {
         it ('retruns the headers of the given csv file', () => {
             return request(app)
@@ -138,12 +145,8 @@ describe('/csv-to-xml', () => {
             return request(app)
                 .post('/csv-to-xml/get-headers')
                 .then(res => {
-                    expect(res.statusCode).toBe(200)
-                    expect(res.type).toBe('application/json')
-
-                    expect('body' in res.body).toBe(true)
-                    expect(res.body.body.message).toBe('A file need to be sent !')
-                    expect(res.body.status).toBe(404)
+                    expect(res.statusCode).toBe(400)
+                    expect(res.text).toBe('The file file is missing')
                 })
         })
 

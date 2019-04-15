@@ -7,6 +7,7 @@ const isCSV = require('../is-csv')
 const getFileExtension = require('../get-file-extension')
 const getEncoding = require('../get-encoding')
 const isEncodingSupported = require('../is-encoding-supported')
+const makeFileExistsMiddleware = require('../middleware/make-files-exists-middleware')
 
 /**
  * Make CSV router
@@ -15,15 +16,11 @@ const makeCSVRouter = () => {
     
     const router = new Router()
 
+    router.use('/read-headers', makeFileExistsMiddleware([ 'file' ]))
+
     router.post('/read-headers', (req, res) => {
         const { files = {} } = req
         const { file } = files || {}
-
-        if (!file) {
-            return res
-                .status(400)
-                .send('You must send a file')
-        }
 
         let extension = getFileExtension(file.name)
 
