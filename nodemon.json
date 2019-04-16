@@ -1,0 +1,7 @@
+{
+    "verbose": true,
+    "ignore": ["*.test.js"],
+    "env": {
+        "APP_SECRET": "s3cr3t"
+    }
+}
