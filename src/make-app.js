@@ -11,6 +11,7 @@ const makeCharacterCheckerRouter = require('./routes/make-character-checker-rout
 const makeCSVToXMLRouter = require('./routes/make-csv-to-xml-router')
 const makeCSVRouter = require('./routes/make-csv-router')
 const makeCitiesRouter = require('./routes/make-cities-router')
+const makeUserRouter = require('./routes/make-user-router')
 /** */
 
 /**
@@ -18,7 +19,7 @@ const makeCitiesRouter = require('./routes/make-cities-router')
  * 
  * @param {{}} params An object containing the app dependencies
  */
-const makeApp = ({ fetch }) => {
+const makeApp = ({ fetch, userModel } = {}) => {
     const app = express()
 
     // middleware to add cors headers
@@ -48,6 +49,7 @@ const makeApp = ({ fetch }) => {
     app.use('/csv-to-xml', makeCSVToXMLRouter())
     app.use('/csv', makeCSVRouter())
     app.use('/cities', makeCitiesRouter({ fetch }))
+    app.use('/', makeUserRouter({ userModel }))
     /** */
 
     return app

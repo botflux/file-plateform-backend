@@ -1,10 +1,38 @@
 const request = require('supertest')
 const makeApp = require('./make-app')
+const { MongoMemoryServer } = require('mongodb-memory-server')
+const mongoose = require('mongoose')
+const userModel = require('./models/user')
+const jwt = require('jsonwebtoken')
+
+jasmine.DEFAULT_TIMEOUT_INTERVAL = 600000
 
 const app = makeApp({
     fetch: () => Promise.resolve({
         json: () => {}
+    }),
+})
+
+let mongod
+let connection
+
+beforeAll(async () => {
+    mongod = new MongoMemoryServer()
+    const uri = await mongod.getUri()
+    connection = mongoose.connect(uri, {
+        useNewUrlParser: true
     })
+})
+
+beforeEach(async done => {
+    for (let collection in mongoose.connection.collections) {
+        mongoose.connection.collections[collection].remove(() => {})
+    }
+    done()
+})
+
+afterAll(async () => {
+    await mongod.stop()
 })
 
 describe('/character-checker', () => {
@@ -261,4 +289,74 @@ describe('/cities', () => {
                 })
         })
     }) 
+})
+
+describe('/login', () => {
+    it ('returns a 400 when there is no username', () => {
+        const app = makeApp()
+
+        return request(app)
+            .post('/login')
+            .field('password', 'dlzepf')
+            .then(res => {
+                expect(res.statusCode).toBe(400)
+                expect(res.text).toBe('Credentials not sent')
+            })
+    })
+
+    it ('returns a 400 when there is no password', () => {
+        const app = makeApp()
+
+        return request(app)
+            .post('/login')
+            .field('email', 'e@m.f')
+            .then(res => {
+                expect(res.statusCode).toBe(400)
+                expect(res.text).toBe('Credentials not sent')
+            })
+    })
+
+    it ('returns a 400 when no user was found', () => {
+        const app = makeApp({
+            userModel
+        })
+
+        return request(app)
+            .post('/login')
+            .field('email', 'e@m.f')
+            .field('password', 'secret')
+            .then(res => {
+                expect(res.statusCode).toBe(400)
+                expect(res.text).toBe('Bad credentials')
+            })
+    })
+
+    it('returns a jwt when the a user was found', async () => {
+        const app = makeApp({
+            userModel
+        })
+
+        const user = new userModel({
+            _id: new mongoose.Types.ObjectId(),
+            email: 'e@m.f',
+            password: 'secret',
+            role: 'ROLE_USER'
+        })
+
+        await user.save()
+
+        return request(app)
+            .post('/login')
+            .field('email', 'e@m.f')
+            .field('password', 'secret')
+            .then(res => {
+                // console.log(res.text)
+                expect(res.statusCode).toBe(200)
+                expect(res.type).toBe('text/plain')
+                expect(jwt.verify(res.text, 's3cr3t')).toEqual(expect.objectContaining({
+                    email: 'e@m.f',
+                    role: 'ROLE_USER'
+                }))
+            })
+    })
 })
