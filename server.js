@@ -10,7 +10,10 @@ const makeApp = require('./src/make-app')
 const app = makeApp({
     fetch, 
     dbConnection, 
-    userModel
+    userModel,
+    settings: {
+        appSecret: process.env.APP_SECRET
+    }
 })
 
 const APPLICATION_PORT = process.env.PORT || 3000

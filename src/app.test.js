@@ -331,9 +331,38 @@ describe('/login', () => {
             })
     })
 
+    it('returns a 400 when something went wrong with the jwt creation', async () => {
+        const app = makeApp({
+            userModel,
+            settings: {
+                appSecret: null
+            }
+        })
+
+        const user = new userModel({
+            _id: new mongoose.Types.ObjectId(),
+            email: 'm@d.c',
+            password: 'secret',
+            role: 'ROLE_ADMIN'
+        })
+
+        await user.save()
+
+        return request(app)
+            .post('/login')
+            .field('email', 'm@d.c')
+            .field('password', 'secret')
+            .then(res => {
+                expect(res.statusCode).toBe(400)
+                expect(res.text).toBe('Something went wrong')
+            })
+    }) 
+
     it('returns a jwt when the a user was found', async () => {
         const app = makeApp({
-            userModel
+            userModel, settings: {
+                appSecret: 's3cr3t'
+            }
         })
 
         const user = new userModel({

@@ -1,7 +1,7 @@
 const { Router } = require('express')
 const jwt = require('jsonwebtoken')
 
-const makeUserRouter = ({ userModel }) => {
+const makeUserRouter = ({ userModel, settings }) => {
     const router = new Router()
 
     router.post('/login', (req, res) => {
@@ -19,20 +19,18 @@ const makeUserRouter = ({ userModel }) => {
                         .status(400)
                         .send('Bad credentials')
 
-                    console.log('bc')
                 } else {
                     const token = jwt.sign({
                         email: user[0].email,
                         role: user[0].role
-                    }, (!process.env.APP_SECRET ? 's3cr3t': process.env.APP_SECRET))
+                    }, settings.appSecret)
 
                     res
                         .type('text/plain')
                         .send(token)
                 }
             })
-            .catch(e => {
-                console.log('e', e)
+            .catch(() => {
                 res
                     .status(400)
                     .send('Something went wrong')
