@@ -4,6 +4,7 @@ const { MongoMemoryServer } = require('mongodb-memory-server')
 const mongoose = require('mongoose')
 const userModel = require('./models/user')
 const jwt = require('jsonwebtoken')
+const password = require('password-hash')
 
 jasmine.DEFAULT_TIMEOUT_INTERVAL = 600000
 
@@ -331,6 +332,30 @@ describe('/login', () => {
             })
     })
 
+    it('returns a 400 when the password is wrong', async () => {
+        const app = makeApp({
+            userModel
+        })
+
+        const user = new userModel({
+            _id: mongoose.Types.ObjectId(),
+            email: 'e@m.f',
+            password: 'correct password',
+            role: 'ROLE_ADMIN'
+        })
+
+        await user.save()
+
+        return request(app)
+            .post('/login')
+            .field('email', 'e@m.f')
+            .field('password', 'wrong password')
+            .then(res => {
+                expect(res.statusCode).toBe(400)
+                expect(res.text).toBe('Bad credentials')
+            })
+    })
+
     it('returns a 400 when something went wrong with the jwt creation', async () => {
         const app = makeApp({
             userModel,
@@ -342,7 +367,7 @@ describe('/login', () => {
         const user = new userModel({
             _id: new mongoose.Types.ObjectId(),
             email: 'm@d.c',
-            password: 'secret',
+            password: password.generate('secret'),
             role: 'ROLE_ADMIN'
         })
 
@@ -368,7 +393,7 @@ describe('/login', () => {
         const user = new userModel({
             _id: new mongoose.Types.ObjectId(),
             email: 'e@m.f',
-            password: 'secret',
+            password: password.generate('secret'),
             role: 'ROLE_USER'
         })
 
@@ -379,9 +404,10 @@ describe('/login', () => {
             .field('email', 'e@m.f')
             .field('password', 'secret')
             .then(res => {
-                // console.log(res.text)
+                console.log(res.text)
                 expect(res.statusCode).toBe(200)
                 expect(res.type).toBe('text/plain')
+                console.log(jwt.verify(res.text, 's3cr3t'))
                 expect(jwt.verify(res.text, 's3cr3t')).toEqual(expect.objectContaining({
                     email: 'e@m.f',
                     role: 'ROLE_USER'

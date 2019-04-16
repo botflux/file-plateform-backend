@@ -29,6 +29,7 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.5.1",
     "node-fetch": "^2.3.0",
+    "password-hash": "^1.2.2",
     "stream-buffers": "^3.0.2",
     "xml-js": "^1.6.11"
   },
