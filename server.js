@@ -1,7 +1,7 @@
 const fetch = require('node-fetch')
 const mongoose = require('mongoose')
 
-const dbConnection = mongoose.connect('mongodb://localhost:27017/file-plateform', {
+const dbConnection = mongoose.connect(process.env.APP_DATABASE_URI, {
     useNewUrlParser: true,
 })
 const userModel = require('./src/models/user')
