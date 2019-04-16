@@ -51,7 +51,7 @@ const makeCSVToXMLRouter = () => {
 
         const { fields = [], documentRoot = 'Root', collectionRoot = 'Element', attributes = {}, declarations = {} } = map
 
-        console.log(map, file)
+        // console.log(map, file)
 
         // we create a readable stream
         const readStream = new Readable()
@@ -63,7 +63,7 @@ const makeCSVToXMLRouter = () => {
         // stores all transformed objects
         let transformedObjects = []
         
-        console.log(JSON.stringify(fields, null, 4))
+        // console.log(JSON.stringify(fields, null, 4))
 
         readStream
             /**
@@ -137,12 +137,12 @@ const makeCSVToXMLRouter = () => {
         const { files = {} } = req
         const { file } = files
 
-        console.log(file)
+        // console.log(file)
 
         // extract the extension from the filename
         let [ extension = '', ...rest ] = file.name.split('.').reverse()
 
-        console.log(extension, file.mimetype)
+        // console.log(extension, file.mimetype)
 
         // if the file is not a CSV file then we return directly a message
         if (!isCSV(extension, file.mimetype)) {
@@ -176,7 +176,7 @@ const makeCSVToXMLRouter = () => {
             })
             // when the stream is finished, we send back the headers
             .on('end', () => {
-                console.log(firstLine)
+                // console.log(firstLine)
                 res.json({
                     status: 200,
                     body: {
