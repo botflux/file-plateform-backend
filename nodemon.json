@@ -1,6 +1,6 @@
 {
     "verbose": true,
-    "ignore": ["*.test.js"],
+    "ignore": ["*.test.js", "*.sandbox.js", ".md", ".bat", ".gitignore", ".gitkeep"],
     "env": {
         "APP_SECRET": "s3cr3t",
         "APP_DATABASE_URI": "mongodb://localhost:27017/file-plateform"
