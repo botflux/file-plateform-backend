@@ -1,23 +1,38 @@
 const jwt = require('jsonwebtoken')
+const util = require('util')
 
-const makeJwtMiddleware = (appSecret, tokenHeader) => (req, res, next) => {
-    if (!req.get(tokenHeader)) {
-        return res
-            .status(400)
-            .send('No token sent')
-    }
+const makeJwtMiddleware = (appSecret, tokenHeader) => async (req, res, next) => {
 
     const token = req.get(tokenHeader)
 
-    try {
-        const payload = jwt.verify(token, appSecret)
-        req.tokenPayload = payload
+    if (token) {
+        try {
+            req.tokenPayload = jwt.verify(token, appSecret)
+            next()
+        } catch (e) {
+            res.status(400).send('Bad token')
+        }
+    } else {
         next()
-    } catch (e) {
-        return res
-            .status(400)
-            .send('Bad token')
     }
+
+    // const token = req.get(tokenHeader)
+
+    // if (token) {
+    //     console.log('h')
+    //     try {
+    //         req.tokenPayload = await util.promisify(jwt.verify)(token, appSecret)
+    //         next()
+    //     } catch (e) {
+    //         console.log('hellooooo')
+    //         res
+    //             .status(400)
+    //             .send('Bad token')
+    //     }
+            
+    // } else {
+    //     next()
+    // }
 }
 
 module.exports = makeJwtMiddleware
