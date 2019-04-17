@@ -13,18 +13,23 @@ const cityVerificationStream = require('../cities/exists-stream')
 const makeCityExists = require('../cities/city-exists')
 const makeCountyExists = require('../cities/county-exists')
 
+const makeJwtMiddleware = require('../middleware/auth/make-jwt-middleware')
+const makeAuthorizarionMiddleware = require('../middleware/auth/make-check-authorization-middleware')
+
 /**
  * Construct the router from it dependecies
  * 
  * @param {{}} dependencies An object containing router dependencies 
  */
-const makeCitiesRouter = ({ fetch }) => {
+const makeCitiesRouter = ({ fetch, settings }) => {
         
     const router = new Router()
 
-    router.use('/exists', makeFileExistsMiddleware([
-        'file'
-    ]))
+    router.use('/exists', [
+        makeJwtMiddleware(settings.appSecret, settings.tokenHeader),
+        makeAuthorizarionMiddleware(['ROLE_USER', 'ROLE_ADMIN']),
+        makeFileExistsMiddleware(['file'])
+    ])
 
     router.post('/exists', (req, res) => {
         let { columnNames = '' } = req.body

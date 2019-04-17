@@ -4,15 +4,22 @@ const { Router } = require('express')
 const characterChecker = require('../character-checker')
 const makeFileExistsMiddleware = require('../middleware/make-files-exists-middleware')
 
+const makeJwtMiddleware = require('../middleware/auth/make-jwt-middleware')
+const makeAuthorizarionMiddleware = require('../middleware/auth/make-check-authorization-middleware')
+
 /**
  * Construct the character checker router
  * 
  * @returns {Router}
  */
-const makeCharacterCheckerRouter = () => {    
+const makeCharacterCheckerRouter = ({ settings }) => {    
     const router = new Router()
 
-    router.use('/', makeFileExistsMiddleware([ 'file' ]))
+    router.use('/', [
+        makeJwtMiddleware(settings.appSecret, settings.tokenHeader),
+        makeAuthorizarionMiddleware(['ROLE_USER', 'ROLE_ADMIN']),
+        makeFileExistsMiddleware([ 'file' ])
+    ])
 
     router.post('/', (req, res) => {
         

@@ -12,7 +12,8 @@ const app = makeApp({
     dbConnection, 
     userModel,
     settings: {
-        appSecret: process.env.APP_SECRET
+        appSecret: process.env.APP_SECRET,
+        tokenHeader: process.env.TOKEN_HEADER
     }
 })
 

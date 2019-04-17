@@ -11,14 +11,22 @@ const isCSV = require('../is-csv')
 const filters = require('../csv-to-xml/filters')
 const makeFileExistsMiddleware = require('../middleware/make-files-exists-middleware')
 
+const makeJwtMiddleware = require('../middleware/auth/make-jwt-middleware')
+const makeAuthorizarionMiddleware = require('../middleware/auth/make-check-authorization-middleware')
+
 /**
  * Construct the CSV to XML router
  * 
  * @returns {Router}
  */
-const makeCSVToXMLRouter = () => {
+const makeCSVToXMLRouter = ({ settings }) => {
         
     const router = new Router()
+
+    router.use([
+        makeJwtMiddleware(settings.appSecret, settings.tokenHeader),
+        makeAuthorizarionMiddleware(['ROLE_USER', 'ROLE_ADMIN']),
+    ])
 
     router.use('/', makeFileExistsMiddleware([ 'file' ]))
 

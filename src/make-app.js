@@ -19,7 +19,7 @@ const makeUserRouter = require('./routes/make-user-router')
  * 
  * @param {{}} params An object containing the app dependencies
  */
-const makeApp = ({ fetch, userModel, settings } = {}) => {
+const makeApp = (dependencies = {}) => {
     const app = express()
 
     // middleware to add cors headers
@@ -45,11 +45,11 @@ const makeApp = ({ fetch, userModel, settings } = {}) => {
     /**
      * Expose routers
      */
-    app.use('/character-checker', makeCharacterCheckerRouter())
-    app.use('/csv-to-xml', makeCSVToXMLRouter())
-    app.use('/csv', makeCSVRouter())
-    app.use('/cities', makeCitiesRouter({ fetch }))
-    app.use('/', makeUserRouter({ userModel, settings }))
+    app.use('/character-checker', makeCharacterCheckerRouter(dependencies))
+    app.use('/csv-to-xml', makeCSVToXMLRouter(dependencies))
+    app.use('/csv', makeCSVRouter(dependencies))
+    app.use('/cities', makeCitiesRouter(dependencies))
+    app.use('/', makeUserRouter(dependencies))
     /** */
 
     return app

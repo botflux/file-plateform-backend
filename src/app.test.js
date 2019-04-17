@@ -12,7 +12,21 @@ const app = makeApp({
     fetch: () => Promise.resolve({
         json: () => {}
     }),
+    settings: {
+        appSecret: 's3cr3t',
+        tokenHeader: 'JWT-TOKEN'
+    }
 })
+
+const adminToken = jwt.sign({
+    email: 'admin@admin.fr',
+    role: 'ROLE_ADMIN'
+}, 's3cr3t')
+
+const userToken = jwt.sign({
+    email: 'user@user.fr',
+    role: 'ROLE_USER'
+}, 's3cr3t')
 
 let mongod
 let connection
@@ -41,6 +55,7 @@ describe('/character-checker', () => {
         it ('returns the invalid characters (happy path)', () => {
             return request(app)
                 .post('/character-checker')
+                .set('JWT-TOKEN', userToken)
                 .attach('file', 'test/test.txt')
                 .then(res => {
                     expect(res.statusCode).toBe(200)
@@ -53,6 +68,7 @@ describe('/character-checker', () => {
         it ('returns an error when no file is given', () => {
             return request(app)
                 .post('/character-checker')
+                .set('JWT-TOKEN', userToken)
                 .then(res => {
                     expect(res.statusCode).toBe(400)
                     expect(res.text).toBe('The file file is missing')
@@ -66,6 +82,7 @@ describe('/csv', () => {
         it('returns headers when receiving a CSV file (utf8)', () => {
             return request(app)
                 .post('/csv/read-headers')
+                .set('JWT-TOKEN', userToken)
                 .attach('file', 'test/csv/utf8.csv')
                 .then(res => {
                     expect(res.statusCode).toBe(200)
@@ -81,6 +98,7 @@ describe('/csv', () => {
         it('returns headers when receiving a CSV file (iso-8859-1)', () => {
             return request(app)
                 .post('/csv/read-headers')
+                .set('JWT-TOKEN', userToken)
                 .attach('file', 'test/csv/iso88591.csv')
                 .then(res => {
                     expect(res.statusCode).toBe(200)
@@ -93,25 +111,22 @@ describe('/csv', () => {
                 })
         })
 
-        it('returns headers when receinving a CSV file (windows-1252)', () => {
+        it('returns 400 when receiving a CSV file (windows-1252)', () => {
             return request(app)
                 .post('/csv/read-headers')
-                .attach('file', 'test/csv/utf8.csv')
+                .set('JWT-TOKEN', userToken)
+                .attach('file', 'test/csv/windows1252.csv')
                 .then(res => {
-                    expect(res.statusCode).toBe(200)
-                    expect(res.type).toBe('application/json')
+                    expect(res.statusCode).toBe(400)
+                    expect(res.text).toBe('Encoding is not supported')
                     
-                    // arrêt was not passing the test even if the file has the right encoding
-                    // expect(res.body.body.headers).toContain('arrêt')
-                    expect(res.body.body.headers).toContain('cœur')
-                    expect(res.body.body.headers).toContain('après')
-                    // expect(res.body.body.headers).toContain('ensoleillé')
                 })
         })
 
         it ('returns a 400 when the file was not sent', () => {
             return request(app)
                 .post('/csv/read-headers')
+                .set('JWT-TOKEN', userToken)
                 .then(res => {
                     expect(res.statusCode).toBe(400)
                     expect(res.text).toBe('The file file is missing')
@@ -122,18 +137,24 @@ describe('/csv', () => {
         it('returns a 400 when the sent file is not a CSV', () => {
             return request(app)
                 .post('/csv/read-headers')
+                .set('JWT-TOKEN', userToken)
+                .attach('file', 'test/test.txt')
                 .then(res => {
                     expect(res.statusCode).toBe(400)
                     expect(res.type).toBe('text/html')
+                    expect(res.text).toBe('File is not a CSV')
                 })
         })
 
         it('returns a 400 when the sent file is not using a supported encoding', () => {
             return request(app)
                 .post('/csv/read-headers')
+                .set('JWT-TOKEN', userToken)
+                .attach('file', 'test/csv/windows1252.csv')
                 .then(res => {
                     expect(res.statusCode).toBe(400)
                     expect(res.type).toBe('text/html')
+                    expect(res.text).toBe('Encoding is not supported')
                 })
         })
     })
@@ -144,6 +165,7 @@ describe('/csv-to-xml', () => {
         it ('returns an error when the file is not given', () => {
             return request(app)
                 .post('/csv-to-xml')
+                .set('JWT-TOKEN', userToken)
                 .then(res => {
                     expect(res.statusCode).toBe(400)
                     expect(res.text).toBe('The file file is missing')
@@ -155,6 +177,7 @@ describe('/csv-to-xml', () => {
         it ('retruns the headers of the given csv file', () => {
             return request(app)
                 .post('/csv-to-xml/get-headers')
+                .set('JWT-TOKEN', userToken)
                 .attach('file', 'test/test.csv')
                 .then(res => {
                     expect(res.statusCode).toBe(200)
@@ -173,6 +196,7 @@ describe('/csv-to-xml', () => {
         it ('returns an error when the file is not given', () => {
             return request(app)
                 .post('/csv-to-xml/get-headers')
+                .set('JWT-TOKEN', userToken)
                 .then(res => {
                     expect(res.statusCode).toBe(400)
                     expect(res.text).toBe('The file file is missing')
@@ -182,6 +206,7 @@ describe('/csv-to-xml', () => {
         it ('returns an error when the given file is not a csv', () => {
             return request(app)
                 .post('/csv-to-xml/get-headers')
+                .set('JWT-TOKEN', userToken)
                 .attach('file', 'test/test.txt')
                 .then(res => {
                     expect(res.statusCode).toBe(200)
@@ -201,6 +226,7 @@ describe('/cities', () => {
         it ('returns a 400 when there is no file', () => {
             return request(app)
                 .post(uri)
+                .set('JWT-TOKEN', userToken)
                 .send('columnNames=a')
                 .then(res => {
                     expect(res.statusCode).toBe(400)
@@ -210,6 +236,7 @@ describe('/cities', () => {
         it ('returns a 400 when the file is not a CSV', () => {
             return request(app)
                 .post(uri)
+                .set('JWT-TOKEN', userToken)
                 .attach('file', 'test/test.txt')
                 .field('columnNames', 'a')
                 .then(res => {
@@ -220,6 +247,7 @@ describe('/cities', () => {
         it ('returns a 400 when the file is using an unsupported encoding', () => {
             return request(app)
                 .post(uri)
+                .set('JWT-TOKEN', userToken)
                 .attach('file', 'test/csv/windows1252.csv')
                 .field('columnNames', 'c')
                 .then(res => {
@@ -230,6 +258,7 @@ describe('/cities', () => {
         it ('returns a 400 when the column names are not sent', () => {
             return request(app)
                 .post(uri)
+                .set('JWT-TOKEN', userToken)
                 .attach('file', 'test/csv/utf8.csv')
                 .then(res => {
                     expect(res.statusCode).toBe(400)
@@ -247,11 +276,16 @@ describe('/cities', () => {
             const app = makeApp({
                 fetch: () => Promise.resolve({
                     json
-                })
+                }),
+                settings: {
+                    appSecret: 's3cr3t',
+                    tokenHeader: 'JWT-TOKEN'
+                }
             })
 
             return request(app)
                 .post(uri)
+                .set('JWT-TOKEN', userToken)
                 .attach('file', 'test/cities/simple-column.csv')
                 .field('columnNames', 'place')
                 .then(res => {
@@ -276,11 +310,16 @@ describe('/cities', () => {
             const app = makeApp({
                 fetch: () => Promise.resolve({
                     json
-                })
+                }),
+                settings: {
+                    appSecret: 's3cr3t',
+                    tokenHeader: 'JWT-TOKEN'
+                }
             })
 
             return request(app)
                 .post(uri)
+                .set('JWT-TOKEN', userToken)
                 .attach('file', 'test/cities/double-columns.csv')
                 .field('columnNames', 'place,place2')
                 .then(res => {
@@ -294,7 +333,12 @@ describe('/cities', () => {
 
 describe('/login', () => {
     it ('returns a 400 when there is no username', () => {
-        const app = makeApp()
+        const app = makeApp({
+            settings: {
+                appSecret: 's3cr3t',
+                tokenHeader: 'JWT-TOKEN'
+            }
+        })
 
         return request(app)
             .post('/login')
@@ -306,7 +350,12 @@ describe('/login', () => {
     })
 
     it ('returns a 400 when there is no password', () => {
-        const app = makeApp()
+        const app = makeApp({
+            settings: {
+                appSecret: 's3cr3t',
+                tokenHeader: 'JWT-TOKEN'
+            }
+        })
 
         return request(app)
             .post('/login')
@@ -319,7 +368,11 @@ describe('/login', () => {
 
     it ('returns a 400 when no user was found', () => {
         const app = makeApp({
-            userModel
+            userModel,
+            settings: {
+                appSecret: 's3cr3t',
+                tokenHeader: 'JWT-TOKEN'
+            }
         })
 
         return request(app)
@@ -334,7 +387,11 @@ describe('/login', () => {
 
     it('returns a 400 when the password is wrong', async () => {
         const app = makeApp({
-            userModel
+            userModel,
+            settings: {
+                appSecret: 's3cr3t',
+                tokenHeader: 'JWT-TOKEN'
+            }
         })
 
         const user = new userModel({
@@ -360,7 +417,7 @@ describe('/login', () => {
         const app = makeApp({
             userModel,
             settings: {
-                appSecret: null
+                appSecret: null,
             }
         })
 
