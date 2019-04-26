@@ -5,7 +5,7 @@ const makeJwtMiddleware = (appSecret, tokenHeader) => (req, res, next) => {
 
     if (token) {
         try {
-            req.tokenPayload = jwt.verify(token, appSecret)
+            req.payload = jwt.verify(token, appSecret)
             next()
         } catch (e) {
             next(e)
