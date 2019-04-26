@@ -21,48 +21,50 @@ const makeCSVRouter = ({ settings }) => {
     
     const router = new Router()
 
-    router.use('/read-headers', [
+    router.use([
         makeJwtMiddleware(settings.appSecret, settings.tokenHeader),
         ...makeAuthorizationMiddleware(['ROLE_USER', 'ROLE_ADMIN']),
-        ...makeFileCheckerMiddleware([ 'file' ])
     ])
 
-    router.post('/read-headers', (req, res) => {
-        const { files = {} } = req
-        const { file } = files || {}
-
-        let extension = getFileExtension(file.name)
-
-        if (!isCSV(extension, file.mimetype)) {
-            return res
-                .status(400)
-                .send('File is not a CSV')
-        }
-
-        const encoding = getEncoding(file.data)
-
-        if (!isEncodingSupported(encoding)) {
-            return res 
-                .status(400)
-                .send('Encoding is not supported')
-        }
-
-        const readable = new Readable()
-        readable.push(file.data.toString(encoding))
-        readable.push(null)
-
-        readable
-            .pipe(csv({
-                delimiter: ';'
-            }))
-            .once('data', (data) => {
-                res.json({
-                    body: {
-                        headers: data
-                    }
+    router.post('/read-headers', [
+        ...makeFileCheckerMiddleware([ 'file' ]),
+        (req, res) => {
+            const { files = {} } = req
+            const { file } = files || {}
+    
+            let extension = getFileExtension(file.name)
+    
+            if (!isCSV(extension, file.mimetype)) {
+                return res
+                    .status(400)
+                    .send('File is not a CSV')
+            }
+    
+            const encoding = getEncoding(file.data)
+    
+            if (!isEncodingSupported(encoding)) {
+                return res 
+                    .status(400)
+                    .send('Encoding is not supported')
+            }
+    
+            const readable = new Readable()
+            readable.push(file.data.toString(encoding))
+            readable.push(null)
+    
+            readable
+                .pipe(csv({
+                    delimiter: ';'
+                }))
+                .once('data', (data) => {
+                    res.json({
+                        body: {
+                            headers: data
+                        }
+                    })
                 })
-            })
-    })
+        }
+    ])
 
     return router
 }
