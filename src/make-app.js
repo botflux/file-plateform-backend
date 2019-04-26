@@ -4,6 +4,8 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const fileUpload = require('express-fileupload')
 const cors = require('cors')
+
+const makeErrorHandlerMiddleware = require('./middleware/error/make-error-handler-middleware')
 /** */
 
 /** Imports routers */
@@ -50,7 +52,13 @@ const makeApp = (dependencies = {}) => {
     app.use('/csv', makeCSVRouter(dependencies))
     app.use('/cities', makeCitiesRouter(dependencies))
     app.use('/', makeUserRouter(dependencies))
-    /** */
+    /**! */
+
+    /**
+     * Error handler middleware
+     */
+    app.use(makeErrorHandlerMiddleware())
+    /**! */
 
     return app
 }
