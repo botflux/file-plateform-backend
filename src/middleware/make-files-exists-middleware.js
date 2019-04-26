@@ -8,15 +8,9 @@ const HTTPError = require('../error/http-error')
  */
 const makeFileExistsMiddleware = filenames => (req, res, next) => {
     const { files = {} } = req
-    let missing = false
-    let missingFiles = []
-    
-    filenames.forEach(filename => {
-        if (!(filename in (files || {}))) {
-            missing = true
-            missingFiles = [...missingFiles, filename]
-        }
-    })
+    const keys = Object.keys(files)
+
+    const missing = keys.reduce((p, n) => filenames.includes(n) ? p : n, true)
 
     if (missing) {
         next(new HTTPError(400, 'File is missing'))

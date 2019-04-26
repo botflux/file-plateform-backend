@@ -10,7 +10,7 @@ describe('#makeCheckAuthorizationMiddleware', () => {
         }
 
         const req = {
-            tokenPayload: { role: 'ROLE_USER' }
+            payload: { role: 'ROLE_USER' }
         } 
         const next = jest.fn(() => {}) 
 
@@ -29,7 +29,7 @@ describe('#makeCheckAuthorizationMiddleware', () => {
         }
 
         const req = {
-            tokenPayload: { role: 'ROLE_USER' }
+            payload: { role: 'ROLE_USER' }
         } 
         const next = jest.fn(() => {}) 
 
@@ -49,14 +49,14 @@ describe('#makeCheckAuthorizationMiddleware', () => {
         }
 
         const req = {
-            tokenPayload: { role: 'ROLE_USER' }
+            payload: { role: 'ROLE_USER' }
         } 
         const next = jest.fn(() => {}) 
 
         const middleware = makeCheckAuthorizationMiddleware(['ROLE_USER', 'ROLE_ADMIN'])
 
         middleware(req, res, next)
-        req.tokenPayload.role = 'ROLE_ADMIN'
+        req.payload.role = 'ROLE_ADMIN'
         middleware(req, res, next)
 
         expect(res.status).toBeCalledTimes(0)

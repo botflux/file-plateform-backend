@@ -1,37 +1,41 @@
 const makeFilesExistsMiddleware = require('./make-files-exists-middleware')
-const httpMocks = require('node-mocks-http')
+const HTTPError = require('../error/http-error')
 
 describe('#makeFilesExistsMiddleware', () => {
-    it('calls next() when the file is defined', () => {
-        const req = httpMocks.createRequest(),
-            res = httpMocks.createResponse()
+    it('calls next when the file is defined', () => {
+        // const req = httpMocks.createRequest(),
+        //     res = httpMocks.createResponse()
+
+        const req = {
+            files: {
+                myFile: {}
+            }
+        }
 
         const middleware = makeFilesExistsMiddleware([ 'myFile' ])
-
-        // define the file
-        req.files.myFile = {}
 
         const next = jest.fn()
 
-        middleware(req, res, next)
+        middleware(req, {}, next)
 
-        expect(next).toBeCalled()
+        expect(next).toBeCalledTimes(1)
     })
 
-    it('returns a 400 http response when the file is not defined', () => {
-        const req = httpMocks.createRequest()
-            res = httpMocks.createResponse()
+    it('calls next with an error when the file is not defined', () => {
+
+        const req = {
+            files: {
+                myFile: null
+            }
+        }
 
         const middleware = makeFilesExistsMiddleware([ 'myFile' ])
 
-        req.files.myFiles = undefined
-
         const next = jest.fn(() => {})
 
-        middleware(req, res, next)
+        middleware(req, {}, next)
 
-        expect(next).toBeCalledTimes(0)
-        expect(res.statusCode).toBe(400)
-        expect(res._getData()).toBe('The file myFile is missing')
+        expect(next).toBeCalledTimes(1)
+        expect(next.mock.calls[0][0] instanceof HTTPError).toBe(true)
     })
 })

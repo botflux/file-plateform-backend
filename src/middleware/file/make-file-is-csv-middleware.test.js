@@ -6,13 +6,15 @@ describe('#makeFileIsCSVMiddleware', () => {
         const fileIsCSVMiddleware = makeFileIsCSVMiddleware([ 'file', 'data' ])
         
         const req = {
-            file: {
-                name: 'file.csv',
-                mimetype: 'text/csv'
-            },
-            data: {
-                name: 'data.csv',
-                mimetype: 'application/csv'
+            files: {
+                file: {
+                    name: 'file.csv',
+                    mimetype: 'text/csv'
+                },
+                data: {
+                    name: 'data.csv',
+                    mimetype: 'application/csv'
+                }
             }
         }
 
@@ -27,13 +29,15 @@ describe('#makeFileIsCSVMiddleware', () => {
         const fileIsCSVMiddleware = makeFileIsCSVMiddleware([ 'file', 'data' ])
 
         const req = {
-            file: {
-                name: 'file.csv',
-                mimetype: 'text/csv'
-            },
-            data: {
-                name: 'data.html',
-                mimetype: 'text/html'
+            files: {
+                file: {
+                    name: 'file.csv',
+                    mimetype: 'text/csv'
+                },
+                data: {
+                    name: 'data.html',
+                    mimetype: 'text/html'
+                }
             }
         }
 
