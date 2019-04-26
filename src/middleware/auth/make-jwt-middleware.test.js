@@ -2,8 +2,7 @@ const makeJwtMiddleware = require('./make-jwt-middleware')
 const jwt = require('jsonwebtoken') 
 
 describe('#makeJwtMiddleware', () => {
-
-    it ('returns 400 when the token is wrong', () => {
+    it ('calls next with an error when the token is wrong', () => {
         const req = {
             get: jest.fn(() => 'bad token')
         }
@@ -18,12 +17,8 @@ describe('#makeJwtMiddleware', () => {
 
         middleware(req, res, next)
 
-        expect(next).toBeCalledTimes(0)
-        expect(req.get).toBeCalledWith('JWT-TOKEN')
-        expect(res.send).toBeCalledTimes(1)
-        expect(res.status).toBeCalledTimes(1)
-        expect(res.status).toBeCalledWith(400)
-        expect(res.send).toBeCalledWith('Bad token')
+        expect(next).toBeCalledTimes(1)
+        expect(next.mock.calls[0][0] instanceof Error).toBe(true)
     })
 
     it ('calls next when no token sent', () => {
