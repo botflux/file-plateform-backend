@@ -28,58 +28,60 @@ const makeCitiesRouter = ({ fetch, settings }) => {
         
     const router = new Router()
 
-    router.use('/exists', [
+    router.use([
         makeJwtMiddleware(settings.appSecret, settings.tokenHeader),
         ...makeAuthorizationMiddleware(['ROLE_USER', 'ROLE_ADMIN']),
-        makeParametersExistMiddleware([ { name: 'columnNames', empty: false } ]),
-        ...makeFileCheckerMiddleware([ 'file' ])
     ])
 
-    router.post('/exists', (req, res) => {
-        let { columnNames = '' } = req.body
-
-        if (columnNames.includes(',')) {
-            columnNames = columnNames.split(',')
-        } else {
-            columnNames = [columnNames]
+    router.post('/exists', [
+        makeParametersExistMiddleware([ { name: 'columnNames', empty: false } ]),
+        ...makeFileCheckerMiddleware([ 'file' ]),
+        (req, res) => {
+            let { columnNames = '' } = req.body
+    
+            if (columnNames.includes(',')) {
+                columnNames = columnNames.split(',')
+            } else {
+                columnNames = [columnNames]
+            }
+    
+            const { files = {} } = req
+            const { file } = files || {}
+    
+            const encoding = getEncoding(file.data)
+    
+            const readable = new Readable()
+            readable.push(file.data.toString(encoding))
+            readable.push(null)
+    
+            const jsonTransform = JSONStream.stringify()
+            const csvStream = csv({
+                delimiter: ';',
+                headers: true
+            })
+    
+            readable
+                .pipe(csvStream)
+    
+            columnNames
+                .map(n => cityVerificationStream(
+                    makeCityExists(fetch, encodeURIComponent),
+                    makeCountyExists(fetch, encodeURIComponent),
+                    column => {
+                        //console.log(column[n], n)
+                        const { groups = {} } = new RegExp(/(?<city>.*)\s\((?<county>.*)\)/, 'g').exec(column[n] || '') || {}
+                        //console.log(groups)
+                        return groups
+                    }
+                ))
+                .forEach(s => csvStream.pipe(s).pipe(jsonTransform))
+    
+                jsonTransform.once('data', () => res.type('application/json'))
+    
+                jsonTransform
+                    .pipe(res)
         }
-
-        const { files = {} } = req
-        const { file } = files || {}
-
-        const encoding = getEncoding(file.data)
-
-        const readable = new Readable()
-        readable.push(file.data.toString(encoding))
-        readable.push(null)
-
-        const jsonTransform = JSONStream.stringify()
-        const csvStream = csv({
-            delimiter: ';',
-            headers: true
-        })
-
-        readable
-            .pipe(csvStream)
-
-        columnNames
-            .map(n => cityVerificationStream(
-                makeCityExists(fetch, encodeURIComponent),
-                makeCountyExists(fetch, encodeURIComponent),
-                column => {
-					//console.log(column[n], n)
-                    const { groups = {} } = new RegExp(/(?<city>.*)\s\((?<county>.*)\)/, 'g').exec(column[n] || '') || {}
-					//console.log(groups)
-                    return groups
-                }
-            ))
-            .forEach(s => csvStream.pipe(s).pipe(jsonTransform))
-
-            jsonTransform.once('data', () => res.type('application/json'))
-
-            jsonTransform
-                .pipe(res)
-    })
+    ])
 
     return router
 }
