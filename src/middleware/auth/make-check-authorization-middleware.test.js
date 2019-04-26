@@ -1,30 +1,9 @@
 const makeCheckAuthorizationMiddleware = require('./make-check-authorization-middleware')
+const HTTPError = require('../../error/http-error')
 
 describe('#makeCheckAuthorizationMiddleware', () => {
-    it ('returns a 400 when request has not a tokenPayload property', () => {
-        const res = {
-            status: jest.fn(() => res),
-            send: jest.fn(() => res)
-        }
 
-        const req = {
-
-        } 
-
-        const next = jest.fn(() => {}) 
-
-        const middleware = makeCheckAuthorizationMiddleware([])
-
-        middleware(req, res, next)
-
-        expect(res.status).toBeCalledWith(400)
-        expect(res.status).toBeCalledTimes(1)
-        expect(res.send).toBeCalledWith('No token sent')
-        expect(res.send).toBeCalledTimes(1)
-        expect(next).toBeCalledTimes(0)
-    })
-
-    it ('returns a 403 when the token is not authorized', () => {
+    it ('calls next with an error when the token is not authorized', () => {
         const res = {
             status: jest.fn(() => res),
             send: jest.fn(() => res)
@@ -35,15 +14,12 @@ describe('#makeCheckAuthorizationMiddleware', () => {
         } 
         const next = jest.fn(() => {}) 
 
-        const middleware = makeCheckAuthorizationMiddleware(['ROLE_ADMIN'])
+        const middleware = makeCheckAuthorizationMiddleware([ 'ROLE_ADMIN' ])
 
         middleware(req, res, next)
 
-        expect(res.status).toBeCalledWith(403)
-        expect(res.status).toBeCalledTimes(1)
-        expect(res.send).toBeCalledWith('Forbidden')
-        expect(res.send).toBeCalledTimes(1)
-        expect(next).toBeCalledTimes(0)
+        expect(next).toBeCalledTimes(1)
+        expect(next.mock.calls[0][0] instanceof HTTPError).toBe(true)
     })
 
     it ('calls next when the token is authorized', () => {
