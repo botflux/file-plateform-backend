@@ -2,13 +2,13 @@ const { Readable } = require('stream')
 const { Router } = require('express')
 
 const characterChecker = require('../character-checker')
-const makeFileExistsMiddleware = require('../middleware/make-files-exists-middleware')
 
 const makeJwtMiddleware = require('../middleware/auth/make-jwt-middleware')
 const makeAuthorizationMiddleware = require('../middleware/auth/make-authorization-middleware')
 
 const makeFileEncodingMiddleware = require('../middleware/file/make-file-encoding-middleware')
 const makeFilesExistsMiddleware = require('../middleware/make-files-exists-middleware')
+
 /**
  * Construct the character checker router
  * 
@@ -54,19 +54,9 @@ const makeCharacterCheckerRouter = ({ settings }) => {
                 .pipe(checker)
                 // checker stream returns objects containing information about the issue
                 // we just add this object to an array
-                .on('data', o => { 
-                    issues = [ 
-                        ...issues, 
-                        { ...o, id: id++ } 
-                    ] 
-                })
+                .on('data', o => issues = [ ...issues, { ...o, id: id++ } ] )
                 // when every issues are found we returns the array as a JSON.
-                .on('end', () => {
-                    res.json({
-                        error: false,
-                        result: issues
-                    })
-                })
+                .on('end', () => res.json({ error: false, result: issues }))
         }
     ])
 
