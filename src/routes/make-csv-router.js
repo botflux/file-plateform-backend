@@ -10,7 +10,9 @@ const isEncodingSupported = require('../is-encoding-supported')
 const makeFileExistsMiddleware = require('../middleware/make-files-exists-middleware')
 
 const makeJwtMiddleware = require('../middleware/auth/make-jwt-middleware')
-const makeAuthorizarionMiddleware = require('../middleware/auth/make-check-authorization-middleware')
+// const makeAuthorizarionMiddleware = require('../middleware/auth/make-check-authorization-middleware')
+const makeAuthorizationMiddleware = require('../middleware/auth/make-authorization-middleware')
+const makeFileCheckerMiddleware = require('../middleware/file/make-csv-file-checker-middleware')
 
 /**
  * Make CSV router
@@ -21,8 +23,8 @@ const makeCSVRouter = ({ settings }) => {
 
     router.use('/read-headers', [
         makeJwtMiddleware(settings.appSecret, settings.tokenHeader),
-        makeAuthorizarionMiddleware(['ROLE_USER', 'ROLE_ADMIN']),
-        makeFileExistsMiddleware([ 'file' ])
+        ...makeAuthorizationMiddleware(['ROLE_USER', 'ROLE_ADMIN']),
+        ...makeFileCheckerMiddleware([ 'file' ])
     ])
 
     router.post('/read-headers', (req, res) => {

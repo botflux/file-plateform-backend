@@ -5,8 +5,10 @@ const characterChecker = require('../character-checker')
 const makeFileExistsMiddleware = require('../middleware/make-files-exists-middleware')
 
 const makeJwtMiddleware = require('../middleware/auth/make-jwt-middleware')
-const makeAuthorizarionMiddleware = require('../middleware/auth/make-check-authorization-middleware')
+const makeAuthorizationMiddleware = require('../middleware/auth/make-authorization-middleware')
 
+const makeFileEncodingMiddleware = require('../middleware/file/make-file-encoding-middleware')
+const makeFilesExistsMiddleware = require('../middleware/make-files-exists-middleware')
 /**
  * Construct the character checker router
  * 
@@ -17,8 +19,10 @@ const makeCharacterCheckerRouter = ({ settings }) => {
 
     router.use('/', [
         makeJwtMiddleware(settings.appSecret, settings.tokenHeader),
-        makeAuthorizarionMiddleware(['ROLE_USER', 'ROLE_ADMIN']),
-        makeFileExistsMiddleware([ 'file' ])
+        // makeAuthorizarionMiddleware(['ROLE_USER', 'ROLE_ADMIN']),
+        ...makeAuthorizationMiddleware(['ROLE_USER', 'ROLE_ADMIN']),
+        makeFilesExistsMiddleware([ 'file' ]),
+        makeFileEncodingMiddleware([ 'file' ]),
     ])
 
     router.post('/', (req, res) => {
@@ -28,14 +32,6 @@ const makeCharacterCheckerRouter = ({ settings }) => {
 
         // get the file named 'file'
         const { file = {} } = files
-
-        // if it is not defined then we return a response
-        // if (file === undefined || file === null || Object.keys(file) == 0) {
-        //     return res.json({
-        //         status: 400,
-        //         message: 'You need to upload a file'
-        //     })
-        // }
 
         // will store all character issues found inside the file
         let issues = []
@@ -64,7 +60,7 @@ const makeCharacterCheckerRouter = ({ settings }) => {
             // when every issues are found we returns the array as a JSON.
             .on('end', () => {
                 res.json({
-                    message: 'Ok',
+                    error: false,
                     result: issues
                 })
             })

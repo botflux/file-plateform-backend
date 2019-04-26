@@ -14,9 +14,10 @@ const makeCityExists = require('../cities/city-exists')
 const makeCountyExists = require('../cities/county-exists')
 
 const makeJwtMiddleware = require('../middleware/auth/make-jwt-middleware')
-const makeAuthorizarionMiddleware = require('../middleware/auth/make-check-authorization-middleware')
+const makeAuthorizationMiddleware = require('../middleware/auth/make-authorization-middleware')
 
 const makeParametersExistMiddleware = require('../middleware/parameters/make-parameters-exist-middleware')
+const makeFileCheckerMiddleware = require('../middleware/file/make-csv-file-checker-middleware')
 
 /**
  * Construct the router from it dependecies
@@ -29,9 +30,9 @@ const makeCitiesRouter = ({ fetch, settings }) => {
 
     router.use('/exists', [
         makeJwtMiddleware(settings.appSecret, settings.tokenHeader),
-        makeAuthorizarionMiddleware(['ROLE_USER', 'ROLE_ADMIN']),
-        makeFileExistsMiddleware(['file']),
-        makeParametersExistMiddleware([ { name: 'columnNames', empty: false } ])
+        ...makeAuthorizationMiddleware(['ROLE_USER', 'ROLE_ADMIN']),
+        makeParametersExistMiddleware([ { name: 'columnNames', empty: false } ]),
+        ...makeFileCheckerMiddleware([ 'file' ])
     ])
 
     router.post('/exists', (req, res) => {
@@ -46,25 +47,7 @@ const makeCitiesRouter = ({ fetch, settings }) => {
         const { files = {} } = req
         const { file } = files || {}
 
-        // if (!file) {
-        //     return res
-        //         .status(400)
-        //         .send('You must send a file')
-        // }
-
-        if (!isCSV(getFileExtension(file.name), file.mimetype)) {
-            return res
-                .status(400)
-                .send('The sent file is not a CSV')
-        }
-
         const encoding = getEncoding(file.data)
-
-        if (!isEncodingSupported(encoding)) {
-            return res
-                .status(400)
-                .send('Wrong encoding')
-        }
 
         const readable = new Readable()
         readable.push(file.data.toString(encoding))
