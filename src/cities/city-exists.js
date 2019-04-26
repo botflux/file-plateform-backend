@@ -1,3 +1,9 @@
+/**
+ * Returns true if the _cityName_ city exists
+ * 
+ * @param {Function} fetch 
+ * @param {Function} encodeURIComponent 
+ */
 const cityExists = (fetch, encodeURIComponent) => cityName => {
     if (typeof cityName !== 'string')
         return Promise.reject('#cityExists: cityName must be a string') 

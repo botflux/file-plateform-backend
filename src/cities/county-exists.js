@@ -1,3 +1,9 @@
+/**
+ * Returns true if _countyName_ county exists
+ * 
+ * @param {Function} fetch 
+ * @param {Function} encodeURIComponent 
+ */
 const makeCountyExists = (fetch, encodeURIComponent) => countyName => {
     if (typeof countyName !== 'string')
         return Promise.reject('#countyExists: countyName must be a string')

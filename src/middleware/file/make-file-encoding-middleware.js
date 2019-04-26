@@ -2,6 +2,11 @@ const getEncoding = require('../../get-encoding')
 const encodingIsSupported = require('../../is-encoding-supported')
 const HTTPError = require('../../error/http-error')
 
+/**
+ * Returns a middleware that check file encoding
+ * 
+ * @param {String[]} fileToCheck Array containing the property name of each file request.files
+ */
 const makeFileEncodingMiddleware = fileToCheck => (req, res, next) => {
     const keys = Object.keys(req.files)
     const filenames = keys.filter(v => fileToCheck.includes(v))

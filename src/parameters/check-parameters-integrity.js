@@ -1,3 +1,9 @@
+/**
+ * Returns true if _requestParameters_ has all items of _parameterList_ as a propertyName
+ * 
+ * @param {String[]} parameterList List of field name
+ * @param {{}[]} requestParameters Object (request.body)
+ */
 const checkParametersIntegrity = (parameterList, requestParameters) => {
     const keys = Object.keys(requestParameters)
 

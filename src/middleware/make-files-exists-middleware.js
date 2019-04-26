@@ -4,7 +4,7 @@ const HTTPError = require('../error/http-error')
  * Make a file verification middleware that tests if each item of 
  * filename list is present is the request
  * 
- * @param {[]} filenames An array containing all the filename
+ * @param {String[]} filenames An array containing all the filename
  */
 const makeFileExistsMiddleware = filenames => (req, res, next) => {
     const { files = {} } = req
