@@ -16,6 +16,8 @@ const makeCountyExists = require('../cities/county-exists')
 const makeJwtMiddleware = require('../middleware/auth/make-jwt-middleware')
 const makeAuthorizarionMiddleware = require('../middleware/auth/make-check-authorization-middleware')
 
+const makeParametersExistMiddleware = require('../middleware/parameters/make-parameters-exist-middleware')
+
 /**
  * Construct the router from it dependecies
  * 
@@ -28,17 +30,12 @@ const makeCitiesRouter = ({ fetch, settings }) => {
     router.use('/exists', [
         makeJwtMiddleware(settings.appSecret, settings.tokenHeader),
         makeAuthorizarionMiddleware(['ROLE_USER', 'ROLE_ADMIN']),
-        makeFileExistsMiddleware(['file'])
+        makeFileExistsMiddleware(['file']),
+        makeParametersExistMiddleware([ { name: 'columnNames', empty: false } ])
     ])
 
     router.post('/exists', (req, res) => {
         let { columnNames = '' } = req.body
-
-        if (columnNames.length === 0) {
-            return res
-                .status(400)
-                .send('No column names sent')
-        }
 
         if (columnNames.includes(',')) {
             columnNames = columnNames.split(',')
@@ -87,7 +84,9 @@ const makeCitiesRouter = ({ fetch, settings }) => {
                 makeCityExists(fetch, encodeURIComponent),
                 makeCountyExists(fetch, encodeURIComponent),
                 column => {
+					//console.log(column[n], n)
                     const { groups = {} } = new RegExp(/(?<city>.*)\s\((?<county>.*)\)/, 'g').exec(column[n] || '') || {}
+					//console.log(groups)
                     return groups
                 }
             ))
