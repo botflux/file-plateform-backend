@@ -1,7 +1,8 @@
 const fetch = require('node-fetch')
 const mongoose = require('mongoose')
+const configuration = require('./config/config')
 
-const dbConnection = mongoose.connect(process.env.APP_DATABASE_URI, {
+const dbConnection = mongoose.connect(configuration.db.uri, {
     useNewUrlParser: true,
 })
 const userModel = require('./src/models/user')
@@ -12,8 +13,8 @@ const app = makeApp({
     dbConnection, 
     userModel,
     settings: {
-        appSecret: process.env.APP_SECRET,
-        tokenHeader: process.env.TOKEN_HEADER
+        appSecret: configuration.authentication.appSecret,
+        tokenHeader: configuration.authentication.tokenHeader
     }
 })
 
