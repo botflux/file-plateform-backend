@@ -17,15 +17,17 @@ describe('#makeFilesExistsMiddleware', () => {
         const next = jest.fn()
 
         middleware(req, {}, next)
+        // console.log(next.mock.calls)
 
         expect(next).toBeCalledTimes(1)
+        expect(next.mock.calls[0].length).toBe(0)
     })
 
     it('calls next with an error when the file is not defined', () => {
 
         const req = {
             files: {
-                myFile: null
+                
             }
         }
 
